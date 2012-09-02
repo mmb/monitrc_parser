@@ -1,0 +1,58 @@
+module MonitrcParser
+
+  grammar Monitrc
+
+    rule monitrc
+      (check_process / whitespace)* {
+        def content
+          elements.map &:content
+        end
+      }
+    end
+
+    rule check_process
+      'check' whitespace 'process' whitespace name whitespace 'with' whitespace 'pidfile' whitespace pidfile {
+        def content
+          CheckProcess.new(name.text_value, pidfile.text_value)
+        end
+      }
+    end
+
+    rule whitespace
+      [\s]+ {
+        def content
+        end
+      }
+    end
+
+    rule name
+      string
+    end
+
+    rule string
+      quoted_string / bare_string
+    end
+
+    rule quoted_string
+      '"' [^"]* '"' {
+        def content
+          text_value[1..-2]
+        end
+      }
+    end
+
+    rule bare_string
+      [^\s]+ {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule pidfile
+      string
+    end
+
+  end
+
+end
