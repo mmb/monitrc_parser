@@ -13,7 +13,7 @@ module MonitrcParser
     rule check_process
       'check' whitespace 'process' whitespace name whitespace 'with' whitespace 'pidfile' whitespace pidfile {
         def content
-          CheckProcess.new(name.text_value, pidfile.text_value)
+          CheckProcess.new(name.content, pidfile.content)
         end
       }
     end
