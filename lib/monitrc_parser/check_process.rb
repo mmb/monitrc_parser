@@ -1,5 +1,5 @@
 module MonitrcParser
 
-  CheckProcess = Struct.new('CheckProcess', :name, :pidfile)
+  CheckProcess = Struct.new('CheckProcess', :name, :options)
 
 end

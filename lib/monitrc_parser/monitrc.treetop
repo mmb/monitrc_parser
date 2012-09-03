@@ -3,7 +3,7 @@ module MonitrcParser
   grammar Monitrc
 
     rule monitrc
-      (check_process / whitespace)* {
+      (whitespace / check_process)* {
         def content
           elements.map &:content
         end
@@ -11,11 +11,37 @@ module MonitrcParser
     end
 
     rule check_process
-      'check' whitespace 'process' whitespace name whitespace 'with' whitespace 'pidfile' whitespace pidfile {
+      'check' whitespace 'process' whitespace name check_process_options {
         def content
-          CheckProcess.new(name.content, pidfile.content)
+          CheckProcess.new(name.content, check_process_options.content)
         end
       }
+    end
+
+    rule check_process_options
+      (whitespace / with_pidfile)* {
+        def content
+          elements.select { |e| e.content }.inject({}) do |options, option|
+            options.merge(option.content) { |key,old,new| [old, new] }
+          end
+        end
+      }
+    end
+
+    rule with_pidfile
+      'with' whitespace 'pidfile' whitespace pidfile {
+        def content
+          { :pidfile => pidfile.content }
+        end
+      }
+    end
+
+    rule pidfile
+      string
+    end
+
+    rule name
+      string
     end
 
     rule whitespace
@@ -23,10 +49,6 @@ module MonitrcParser
         def content
         end
       }
-    end
-
-    rule name
-      string
     end
 
     rule string
@@ -47,10 +69,6 @@ module MonitrcParser
           text_value
         end
       }
-    end
-
-    rule pidfile
-      string
     end
 
   end
