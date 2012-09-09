@@ -5,7 +5,7 @@ module MonitrcParser
     rule monitrc
       (whitespace / check_process)* {
         def content
-          elements.map &:content
+          elements.map(&:content).compact
         end
       }
     end
