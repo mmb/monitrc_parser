@@ -46,6 +46,26 @@ eos
       result.options[:start][:command].should == '/some/dir/some_program start'
     end
 
+    it 'should parse a check process with a stop option' do
+      input = <<-eos
+check process apache
+stop program = "/some/dir/some_program stop"
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:stop][:command].should == '/some/dir/some_program stop'
+    end
+
+    it 'should parse a check process with a stop option without the optional =' do
+      input = <<-eos
+check process apache
+stop program "/some/dir/some_program stop"
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:stop][:command].should == '/some/dir/some_program stop'
+    end
+
   end
 
 end

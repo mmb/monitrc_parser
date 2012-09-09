@@ -19,7 +19,7 @@ module MonitrcParser
     end
 
     rule check_process_options
-      (whitespace / with_pidfile / start_program)* {
+      (whitespace / with_pidfile / start_program / stop_program)* {
         def content
           elements.select { |e| e.content }.inject({}) do |options, option|
             options.merge(option.content) { |key,old,new| [old, new] }
@@ -40,6 +40,17 @@ module MonitrcParser
       'start' whitespace 'program' whitespace ('=' whitespace)? command {
         def content
           { :start => {
+              :command => command.content,
+            },
+          }
+        end
+      }
+    end
+
+    rule stop_program
+      'stop' whitespace 'program' whitespace ('=' whitespace)? command {
+        def content
+          { :stop => {
               :command => command.content,
             },
           }
