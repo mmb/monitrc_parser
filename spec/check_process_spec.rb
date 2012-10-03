@@ -66,6 +66,16 @@ eos
       result.options[:stop][:command].should == '/some/dir/some_program stop'
     end
 
+    it 'should parse a check process with a group option' do
+      input = <<-eos
+check process redis
+group group1
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:group].should == 'group1'
+    end
+
   end
 
 end
