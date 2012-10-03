@@ -19,7 +19,8 @@ module MonitrcParser
     end
 
     rule check_process_options
-      (whitespace / with_pidfile / start_program / stop_program / group)* {
+      (whitespace / with_pidfile / start_program / stop_program / group /
+      mode)* {
         def content
           elements.select { |e| e.content }.inject({}) do |options, option|
             options.merge(option.content) { |key,old,new| [old, new] }
@@ -66,6 +67,14 @@ module MonitrcParser
       }
     end
 
+    rule mode
+      'mode' whitespace mode_name {
+        def content
+          { :mode => mode_name.content }
+        end
+      }
+    end
+
     rule pidfile
       string
     end
@@ -80,6 +89,14 @@ module MonitrcParser
 
     rule group_name
       string
+    end
+
+    rule mode_name
+      ('active' / 'passive' / 'manual') {
+        def content
+          text_value
+        end
+      }
     end
 
     rule whitespace

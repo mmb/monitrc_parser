@@ -76,6 +76,44 @@ eos
       result.options[:group].should == 'group1'
     end
 
+    it 'should parse a check process with a mode active option' do
+      input = <<-eos
+check process mongodb
+mode active
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:mode].should == 'active'
+    end
+
+    it 'should parse a check process with a mode manual option' do
+      input = <<-eos
+check process mongodb
+mode manual
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:mode].should == 'manual'
+    end
+
+    it 'should parse a check process with a mode passive option' do
+      input = <<-eos
+check process mongodb
+mode passive
+eos
+      result = subject.parse(input).content[0]
+
+      result.options[:mode].should == 'passive'
+    end
+
+    it 'should fail to parse a check process with a invalid mode option' do
+      input = <<-eos
+check process mongodb
+mode foo
+eos
+      subject.parse(input).should be_nil
+    end
+
   end
 
 end
