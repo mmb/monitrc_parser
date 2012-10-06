@@ -4,13 +4,13 @@ module MonitrcParser
 
   describe CheckProcess do
 
-    subject { MonitrcParser.new }
+    subject { Parser.new }
 
     it 'should parse a check process with no options' do
       input = <<-eos
 check process apache
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.should be_a(CheckProcess)
       result.name.should == 'apache'
@@ -21,7 +21,7 @@ eos
 check process apache
 with pidfile /some/dir/some_process.pid
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:pidfile].should == '/some/dir/some_process.pid'
     end
@@ -31,7 +31,7 @@ eos
 check process apache
 start program = "/some/dir/some_program start"
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:start][:command].should == '/some/dir/some_program start'
     end
@@ -41,7 +41,7 @@ eos
 check process apache
 start program "/some/dir/some_program start"
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:start][:command].should == '/some/dir/some_program start'
     end
@@ -51,7 +51,7 @@ eos
 check process apache
 stop program = "/some/dir/some_program stop"
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:stop][:command].should == '/some/dir/some_program stop'
     end
@@ -61,7 +61,7 @@ eos
 check process apache
 stop program "/some/dir/some_program stop"
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:stop][:command].should == '/some/dir/some_program stop'
     end
@@ -71,7 +71,7 @@ eos
 check process redis
 group group1
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:group].should == 'group1'
     end
@@ -81,7 +81,7 @@ eos
 check process mongodb
 mode active
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:mode].should == 'active'
     end
@@ -91,7 +91,7 @@ eos
 check process mongodb
 mode manual
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:mode].should == 'manual'
     end
@@ -101,7 +101,7 @@ eos
 check process mongodb
 mode passive
 eos
-      result = subject.parse(input).content[0]
+      result = subject.parse(input)[0]
 
       result.options[:mode].should == 'passive'
     end
@@ -111,7 +111,7 @@ eos
 check process mongodb
 mode foo
 eos
-      subject.parse(input).should be_nil
+      expect { subject.parse(input) }.to raise_error(ParseException)
     end
 
   end
