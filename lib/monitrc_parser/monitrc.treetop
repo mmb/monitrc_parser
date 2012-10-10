@@ -20,7 +20,7 @@ module MonitrcParser
 
     rule check_process_options
       (whitespace / with_pidfile / start_program / stop_program / group /
-      mode)* {
+      mode / process_resource_test)* {
         def content
           elements.select { |e| e.content }.inject({}) do |options, option|
             options.merge(option.content) { |key,old,new| [old, new] }
@@ -75,6 +75,19 @@ module MonitrcParser
       }
     end
 
+    rule process_resource_test
+      'if' whitespace process_resource whitespace operator whitespace value
+      whitespace? unit whitespace cycles:cycles? 'then' whitespace
+      action {
+        def content
+          { :if =>
+            ResourceTest.new(process_resource.content, operator.content,
+            value.content, unit.content, action.content, cycles.content)
+          }
+        end
+      }
+    end
+
     rule pidfile
       string
     end
@@ -93,6 +106,56 @@ module MonitrcParser
 
     rule mode_name
       ('active' / 'passive' / 'manual') {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule process_resource
+      ('cpu' / 'totalcpu' / 'memory' / 'children' / 'totalmem' /
+      'loadavg' ('1m' / '5m' / '15m')) {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule operator
+      ('<' / '>' / '!=' / '==' / 'gt' / 'lt' / 'eq' / 'ne' / 'greater' /
+      'less' / 'equal' / 'notequal') {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule value
+      (real / integer)
+    end
+
+    rule unit
+      ('%' / 'B' / 'kB' / 'MB' / 'GB') {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule cycles
+      'for' whitespace cycle_count whitespace 'cycles' whitespace {
+        def content
+          cycle_count.content
+        end
+      }
+    end
+
+    rule cycle_count
+      integer
+    end
+
+    rule action
+      ('alert' / 'restart' / 'start' / 'stop' / 'exec' / 'unmonitor') {
         def content
           text_value
         end
@@ -122,6 +185,22 @@ module MonitrcParser
       [^\s]+ {
         def content
           text_value
+        end
+      }
+    end
+
+    rule real
+      [\d]+ [.] [\d]+ {
+        def content
+          text_value.to_f
+        end
+      }
+    end
+
+    rule integer
+      [\d]+ {
+        def content
+          text_value.to_i
         end
       }
     end
