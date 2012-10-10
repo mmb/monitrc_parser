@@ -11,7 +11,7 @@ module MonitrcParser
 
       unless result
         raise ParseException,
-          "Parse error at character #{@parser.index}: #{input[@parser.index, 16]}"
+          "Parse error at character #{@parser.index} starting with '#{input[@parser.index, 16]}'"
       end
 
       result.content
