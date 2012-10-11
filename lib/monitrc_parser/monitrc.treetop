@@ -82,7 +82,8 @@ module MonitrcParser
         def content
           { :if =>
             ResourceTest.new(process_resource.content, operator.content,
-            value.content, unit.content, action.content, cycles.content)
+            value.content, unit.content, action.content,
+            cycles.empty? ? nil : cycles.content)
           }
         end
       }
