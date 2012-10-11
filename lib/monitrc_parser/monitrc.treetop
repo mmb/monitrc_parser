@@ -136,7 +136,7 @@ module MonitrcParser
     end
 
     rule unit
-      ('%' / 'B' / 'kB' / 'MB' / 'GB') {
+      ('%' / [Bb] / [Kk] [Bb] / [Mm] [Bb] / [Gg] [Bb]) {
         def content
           text_value
         end
