@@ -114,6 +114,26 @@ eos
       expect { subject.parse(input) }.to raise_error(ParseException)
     end
 
+    it 'should parse a check process with a single depends' do
+      input = <<-eos
+check process hubot
+depends on redis
+eos
+      result = subject.parse(input)[0]
+
+      result.options[:depends].should == %w{redis}
+    end
+
+    it 'should parse a check process with a multiple depends' do
+      input = <<-eos
+check process hubot
+depends on redis,postgres
+eos
+      result = subject.parse(input)[0]
+
+      result.options[:depends].should == %w{redis postgres}
+    end
+
   end
 
 end

@@ -11,16 +11,17 @@ module MonitrcParser
     end
 
     rule check_process
-      'check' whitespace 'process' whitespace name check_process_options {
+      'check' whitespace 'process' whitespace service_name
+      check_process_options {
         def content
-          CheckProcess.new(name.content, check_process_options.content)
+          CheckProcess.new(service_name.content, check_process_options.content)
         end
       }
     end
 
     rule check_process_options
       (whitespace / with_pidfile / start_program / stop_program / group /
-      mode / process_resource_test)* {
+      mode / process_resource_test / depends)* {
         def content
           elements.select { |e| e.content }.inject({}) do |options, option|
             options.merge(option.content) { |key,old,new| [old, new] }
@@ -89,11 +90,32 @@ module MonitrcParser
       }
     end
 
-    rule pidfile
-      string
+    rule depends
+      'depends' whitespace 'on' whitespace service_name
+      add:additional_service* {
+        def content
+          { :depends => [service_name.content] + add.elements.map(&:content) }
+        end
+      }
     end
 
-    rule name
+    rule additional_service
+      whitespace? ',' whitespace? service_name {
+        def content
+          service_name.content
+        end
+      }
+    end
+
+    rule service_name
+      [^\s,]+ {
+        def content
+          text_value
+        end
+      }
+    end
+
+    rule pidfile
       string
     end
 
