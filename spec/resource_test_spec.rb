@@ -9,7 +9,7 @@ module MonitrcParser
 check process mongodb
 if totalmem > 1.5 GB for 2 cycles then restart
 eos
-      subject.parse(input)[0][:options][:if]['value'].should == 1.5
+      subject.parse(input)[0][:options][:if].value.should == 1.5
     end
 
     it 'should parse an integer value in a resource test' do
@@ -17,7 +17,7 @@ eos
 check process mongodb
 if totalmem > 500 MB for 2 cycles then restart
 eos
-      subject.parse(input)[0][:options][:if]['value'].should == 500
+      subject.parse(input)[0][:options][:if].value.should == 500
     end
 
     it 'should parse a resource test with cycles' do
